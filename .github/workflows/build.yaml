@@ -115,9 +115,10 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-          # Include version in cache scope to prevent stale cached builds with wrong version
-          cache-from: type=gha,scope=build-${{ needs.prepare.outputs.is_release }}
-          cache-to: type=gha,mode=max,scope=build-${{ needs.prepare.outputs.is_release }}
+          # Use mode=min to only cache layers in the final build stage (reduces GHA storage)
+          # Scope to 'build' so main and PRs share the cache efficiently
+          cache-from: type=gha,scope=build
+          cache-to: type=gha,mode=min,scope=build
           build-args: |
             VERSION=${{ needs.prepare.outputs.version }}
             COMMIT=${{ github.sha }}
